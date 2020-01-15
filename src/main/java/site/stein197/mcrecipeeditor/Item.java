@@ -1,4 +1,4 @@
-package editor;
+package site.stein197.mcrecipeeditor;
 
 /**
  * Represents all minecraft items and blocks that
