@@ -1,9 +1,19 @@
 package site.stein197.mcrecipeeditor;
 
 import java.io.IOException;
+
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JToolBar;
+import javax.swing.border.EmptyBorder;
+
+import net.miginfocom.swing.MigLayout;
+
+import java.awt.Insets;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.Dimension;
@@ -28,6 +38,7 @@ public class Application {
 		if (!propertiesAreLoaded)
 			this.showErrorMessage("Failed to load properties", new Exception());
 		this.setupGUI();
+		this.setupToolbar();
 		this.setListeners();
 		this.frame.setVisible(true);
 	}
@@ -71,8 +82,14 @@ public class Application {
 	}
 
 	private void setupGUI() {
-		var icon = new ImageIcon(FileManager.getResource("/images/grass_side.png"));
-		this.frame.setIconImage(icon.getImage());
+		this.frame.setIconImage(new ImageIcon(FileManager.getResource("/images/grass_side.png")).getImage());
+		var root = new JPanel();
+		root.setLayout(new MigLayout());
+		this.frame.setContentPane(root);
+		this.setupLocation();
+	}
+
+	private void setupLocation() {
 		var size = new Dimension();
 		String savedWidth = this.properties.getValue("width");
 		String savedHeight = this.properties.getValue("height");
@@ -80,6 +97,7 @@ public class Application {
 			size.width = Integer.parseInt(savedWidth);
 		if (savedHeight != null)
 			size.height = Integer.parseInt(savedHeight);
+
 		String savedLeft = this.properties.getValue("left");
 		String savedTop = this.properties.getValue("top");
 		var location = new Point();
@@ -87,11 +105,25 @@ public class Application {
 			location.x = Integer.parseInt(savedLeft);
 		if (savedTop != null)
 			location.y = Integer.parseInt(savedTop);
+
 		String fullscreen = this.properties.getValue("fullscreen");
-		boolean isFullscreen = Boolean.parseBoolean(fullscreen);
+		boolean isFullscreen = fullscreen == null || fullscreen != null && Boolean.parseBoolean(fullscreen);
 		this.frame.setExtendedState(isFullscreen ? JFrame.MAXIMIZED_BOTH : JFrame.NORMAL);
 		this.frame.setLocation(location);
 		this.frame.setSize(size);
+	}
+
+	private void setupToolbar() {
+		var toolbar = new JToolBar();
+		toolbar.setFloatable(false);
+		toolbar.setMargin(new Insets(10, 10, 10, 10));
+		var addBtn = new JButton(new ImageIcon(FileManager.getResource("/images/icon_plus.png")));
+		addBtn.setSize(new Dimension(16, 16));
+		addBtn.setBorder(null);
+		addBtn.setMargin(new Insets(0, 0, 0, 0));
+		toolbar.add(addBtn);
+		toolbar.setAlignmentX(java.awt.Container.LEFT_ALIGNMENT);
+		this.frame.getContentPane().add(toolbar);
 	}
 
 	/**

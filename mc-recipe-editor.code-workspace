@@ -5,6 +5,7 @@
 		}
 	],
 	"settings": {
-		"java.dependency.packagePresentation": "flat"
+		"java.dependency.packagePresentation": "flat",
+		"java.configuration.updateBuildConfiguration": "interactive"
 	}
 }

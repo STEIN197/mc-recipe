@@ -28,6 +28,11 @@
 			<version>1.1.1</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.miglayout</groupId>
+			<artifactId>miglayout-swing</artifactId>
+			<version>5.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -53,6 +58,11 @@
 					</archive>
 				</configuration>
 			</plugin>
+			<!-- <plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>3.2.0</version>
+			</plugin> -->
 		</plugins>
 	</build>
 
