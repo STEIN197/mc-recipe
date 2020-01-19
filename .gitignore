@@ -1,6 +1,5 @@
 target
-*.png
-!src/main/resources/
+/*.png
 *.xcf
 !.gitignore
 !.vscode
