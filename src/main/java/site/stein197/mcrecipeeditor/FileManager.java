@@ -39,12 +39,20 @@ public class FileManager {
 	}
 
 	private void createFile() throws IOException, SecurityException {
-		String[] pathParts = this.path.split("/");
-		if (pathParts.length > 1) {
-			var dirAr = new String[pathParts.length - 1];
-			System.arraycopy(pathParts, 0, dirAr, 0, pathParts.length - 1);
-			String dirPath = String.join("/", dirAr);
-			new File(JAR_FILE, dirPath).mkdirs();
+		boolean created = false;
+		try {
+			created = this.file.createNewFile();
+		} catch (IOException ex) {
+			created = false;
+		}
+		if (!created) {
+			String[] pathParts = this.path.split("/");
+			if (pathParts.length > 1) {
+				var dirAr = new String[pathParts.length - 1];
+				System.arraycopy(pathParts, 0, dirAr, 0, pathParts.length - 1);
+				String dirPath = String.join("/", dirAr);
+				new File(JAR_FILE, dirPath).mkdirs();
+			}
 		}
 		this.file.createNewFile();
 	}
@@ -53,4 +61,3 @@ public class FileManager {
 		return FileManager.class.getResource(path);
 	}
 }
-// TODO Try to test this class

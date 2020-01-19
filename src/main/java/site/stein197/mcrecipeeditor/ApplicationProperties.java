@@ -9,11 +9,9 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 
-/**
- * Represents application properties.
- */
 public class ApplicationProperties {
 
+	private static final String PROPERTIES_PATH = Application.FOLDER_PATH + "properties.conf";
 	private static ApplicationProperties instance;
 	private HashMap<String, String> properties;
 	private File file;
@@ -54,7 +52,7 @@ public class ApplicationProperties {
 	}
 
 	private void load() throws IllegalArgumentException, URISyntaxException, IOException {
-		var manager = new FileManager(Application.PROPERTIES_PATH);
+		var manager = new FileManager(PROPERTIES_PATH);
 		this.file = manager.loadFile();
 	}
 
@@ -77,3 +75,4 @@ public class ApplicationProperties {
 		reader.close();
 	}
 }
+// TODO What if file has illegal format

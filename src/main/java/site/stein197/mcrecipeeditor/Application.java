@@ -1,20 +1,22 @@
 package site.stein197.mcrecipeeditor;
 
+import site.stein197.mcrecipeeditor.gui.ToolBar;
+
 import java.io.IOException;
 
-import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JToolBar;
-import javax.swing.border.EmptyBorder;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTextField;
 
 import net.miginfocom.swing.MigLayout;
 
-import java.awt.Insets;
 import java.awt.event.WindowAdapter;
+import java.awt.Color;
 import java.awt.event.WindowEvent;
 import java.awt.Dimension;
 import java.awt.Point;
@@ -23,9 +25,9 @@ public class Application {
 
 	public static final Application instance = new Application();
 	public static final String TITLE = "Minecraft Recipe Editor";
-	public static final String PROPERTIES_PATH = "./mc.conf";
+	public static final String FOLDER_PATH = "./mceditor/";
 
-	private final JFrame frame = new JFrame(TITLE);
+	public final JFrame frame = new JFrame(TITLE);
 	private ApplicationProperties properties;
 
 	public static void main(String... args) throws Exception {
@@ -38,7 +40,6 @@ public class Application {
 		if (!propertiesAreLoaded)
 			this.showErrorMessage("Failed to load properties", new Exception());
 		this.setupGUI();
-		this.setupToolbar();
 		this.setListeners();
 		this.frame.setVisible(true);
 	}
@@ -60,33 +61,19 @@ public class Application {
 	}
 
 	private void setListeners() {
-		this.frame.addWindowListener(new WindowAdapter() {
-
-			@Override
-			public void windowClosing(WindowEvent e) {
-				var properties = Application.this.properties;
-				var frame = Application.this.frame;
-				properties.setValue("width", Integer.toString(frame.getWidth()));
-				properties.setValue("height", Integer.toString(frame.getHeight()));
-				Point location = frame.getLocationOnScreen();
-				properties.setValue("left", Integer.toString(location.x));
-				properties.setValue("top", Integer.toString(location.y));
-				properties.setValue("fullscreen", Boolean.toString(frame.getExtendedState() == JFrame.MAXIMIZED_BOTH));
-				try {
-					Application.this.properties.saveChanges();
-				} catch (IOException ex) {
-					Application.this.showErrorMessage(ex.getMessage(), ex);
-				}
-			}
-		});
+		this.onWindowClosing();
 	}
 
 	private void setupGUI() {
 		this.frame.setIconImage(new ImageIcon(FileManager.getResource("/images/grass_side.png")).getImage());
 		var root = new JPanel();
-		root.setLayout(new MigLayout());
+		root.setBackground(new Color(0, 0, 0));
+		root.setBorder(null);
+		root.setLayout(new MigLayout("insets 0, wrap 1, gap 0", "[grow, fill]", "[][fill]"));
 		this.frame.setContentPane(root);
 		this.setupLocation();
+		this.frame.add(ToolBar.instance);
+		this.setupSplitPane();
 	}
 
 	private void setupLocation() {
@@ -113,17 +100,25 @@ public class Application {
 		this.frame.setSize(size);
 	}
 
-	private void setupToolbar() {
-		var toolbar = new JToolBar();
-		toolbar.setFloatable(false);
-		toolbar.setMargin(new Insets(10, 10, 10, 10));
-		var addBtn = new JButton(new ImageIcon(FileManager.getResource("/images/icon_plus.png")));
-		addBtn.setSize(new Dimension(16, 16));
-		addBtn.setBorder(null);
-		addBtn.setMargin(new Insets(0, 0, 0, 0));
-		toolbar.add(addBtn);
-		toolbar.setAlignmentX(java.awt.Container.LEFT_ALIGNMENT);
-		this.frame.getContentPane().add(toolbar);
+	private void setupSplitPane() {
+		var splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+		splitPane.setDividerLocation(0.5);
+		splitPane.setResizeWeight(0.5);
+		this.setupLeftSide(splitPane);
+		this.frame.add(splitPane, "pushy");
+	}
+
+	private void setupLeftSide(JSplitPane splitPane) {
+		var pane = new JPanel(new MigLayout("wrap 1", "[grow, fill]"));
+		var scrollPane = new JScrollPane(pane);
+		// scrollPane.setLayout(new MigLayout("flowy"));
+		var label = new JLabel("Search items");
+		var searchField = new JTextField();
+		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		pane.add(label);
+		pane.add(searchField, "growx 100");
+		splitPane.setLeftComponent(scrollPane);
 	}
 
 	/**
@@ -139,5 +134,27 @@ public class Application {
 			this.showErrorMessage(ex.getMessage(), ex);
 			return false;
 		}
+	}
+
+	private void onWindowClosing() {
+		this.frame.addWindowListener(new WindowAdapter() {
+
+			@Override
+			public void windowClosing(WindowEvent e) {
+				var properties = Application.this.properties;
+				var frame = Application.this.frame;
+				properties.setValue("width", Integer.toString(frame.getWidth()));
+				properties.setValue("height", Integer.toString(frame.getHeight()));
+				Point location = frame.getLocationOnScreen();
+				properties.setValue("left", Integer.toString(location.x));
+				properties.setValue("top", Integer.toString(location.y));
+				properties.setValue("fullscreen", Boolean.toString(frame.getExtendedState() == JFrame.MAXIMIZED_BOTH));
+				try {
+					Application.this.properties.saveChanges();
+				} catch (IOException ex) {
+					Application.this.showErrorMessage(ex.getMessage(), ex);
+				}
+			}
+		});
 	}
 }

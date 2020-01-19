@@ -1,14 +1,11 @@
 package site.stein197.mcrecipeeditor;
 
-/**
- * Represents all minecraft items and blocks that
- * can be created or used as component in recipes.
- */
+import java.io.File;
+
 public class Item {
 
-	/** External minecraft item id. For example stone has id 1 */
-	private int externalID;
-	private String externalNS;
-	private String externalName;
-	
+	private int ID;
+	private String nsID;
+	private String name;
+	private File image;
 }
