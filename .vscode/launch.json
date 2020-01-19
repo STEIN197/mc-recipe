@@ -4,8 +4,8 @@
 			"type": "java",
 			"name": "CodeLens (Launch) - Application",
 			"request": "launch",
-			"mainClass": "site.stein197.mcrecipeeditor.Application",
-			"projectName": "mc-recipe-editor"
+			"mainClass": "site.stein197.mcrecipe.Application",
+			"projectName": "mc-recipe"
 		}
 	]
 }

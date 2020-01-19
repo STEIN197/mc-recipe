@@ -31,27 +31,18 @@ public class Application {
 
 	public static final Application instance = new Application();
 	public static final String TITLE = "Minecraft Recipe Editor";
-	public static final String FOLDER_PATH = "./mceditor/";
+	public static final String FOLDER_PATH = "./mcrecipe/";
 
 	public final JFrame frame = new JFrame(TITLE);
 	private ApplicationProperties properties;
 
 	public static void main(String... args) throws Exception {
-		// System.out.println(new FileManager(FOLDER_PATH + "ff").loadFile().toString());
-		// Connection co = DriverManager.getConnection("jdbc:sqlite:users.db");
-		// var q = "create table if not exists user (name varchar(5), phone varchar (5))";
-		// Statement s = co.createStatement();
-		// s.executeUpdate(q);
-		// q = "insert into user (name, phone) values ('nm', 'ph')";
-		// s = co.createStatement();
-		// s.executeUpdate(q);
+		Database.getInstance();
 	}
 
 	private Application() {
 		this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		var propertiesAreLoaded = this.loadProperties();
-		if (!propertiesAreLoaded)
-			this.showExceptionMessage("Failed to load properties", new Exception());
+		this.loadProperties();
 		this.setupGUI();
 		this.setListeners();
 		this.frame.setVisible(true);
@@ -65,13 +56,15 @@ public class Application {
 	public void showExceptionMessage(String message, Exception ex) {
 		message = message == null ? "" : message;
 		var builder = new StringBuilder(message);
+		builder.append("\n");
 		for (StackTraceElement e : ex.getStackTrace()) {
 			builder
 				.append("\n")
 				.append(e.toString());
 		}
 		JOptionPane.showMessageDialog(this.frame, builder.toString(), ex.getClass().getCanonicalName(), JOptionPane.ERROR_MESSAGE);
-	} // TODO System.exit();
+		System.exit(1);
+	}
 
 	public void showExceptionMessage(Exception ex) {
 		this.showExceptionMessage(ex.getMessage(), ex);
@@ -143,13 +136,11 @@ public class Application {
 	 * @param path Relative path to file.
 	 * @return {@code true} if configuration was successfully loaded.
 	 */
-	private boolean loadProperties() {
+	private void loadProperties() {
 		try {
 			this.properties = ApplicationProperties.getInstance();
-			return true;
 		} catch (Exception ex) {
 			this.showExceptionMessage(ex.getMessage(), ex);
-			return false;
 		}
 	}
 
@@ -169,7 +160,7 @@ public class Application {
 				try {
 					Application.this.properties.saveChanges();
 				} catch (IOException ex) {
-					Application.this.showExceptionMessage(ex.getMessage(), ex);
+					Application.this.showExceptionMessage(ex);
 				}
 			}
 		});

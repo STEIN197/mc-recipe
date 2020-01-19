@@ -10,7 +10,7 @@ import java.net.URL;
  */
 public class FileManager {
 
-	private static File JAR_FILE;
+	public static File CURRENT_DIRECTORY;
 
 	private final String path;
 	private final File file;
@@ -18,7 +18,7 @@ public class FileManager {
 	static {
 		var url = FileManager.class.getProtectionDomain().getCodeSource().getLocation();
 		try {
-			JAR_FILE = new File(url.toURI()).getParentFile();
+			CURRENT_DIRECTORY = new File(url.toURI()).getParentFile();
 		} catch (URISyntaxException ex) {
 			Application.instance.showExceptionMessage(ex);
 		}
@@ -28,9 +28,15 @@ public class FileManager {
 		if (path == null || path.length() == 0)
 			throw new IllegalArgumentException("Empty path string");
 		this.path = path;
-		this.file = new File(JAR_FILE, path);
+		this.file = new File(CURRENT_DIRECTORY, path);
 	}
 
+	/**
+	 * Creates file anyway.
+	 * @return
+	 * @throws IOException
+	 * @throws SecurityException
+	 */
 	public File loadFile() throws IOException, SecurityException {
 		if (!this.file.exists()) {
 			this.createFile();
@@ -51,7 +57,7 @@ public class FileManager {
 				var dirAr = new String[pathParts.length - 1];
 				System.arraycopy(pathParts, 0, dirAr, 0, pathParts.length - 1);
 				String dirPath = String.join("/", dirAr);
-				new File(JAR_FILE, dirPath).mkdirs();
+				new File(CURRENT_DIRECTORY, dirPath).mkdirs();
 			}
 		}
 		this.file.createNewFile();
