@@ -1,4 +1,4 @@
-package site.stein197.mcrecipeeditor;
+package site.stein197.mcrecipe;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,7 +20,7 @@ public class FileManager {
 		try {
 			JAR_FILE = new File(url.toURI()).getParentFile();
 		} catch (URISyntaxException ex) {
-			Application.instance.showErrorMessage(ex.getMessage(), ex);
+			Application.instance.showExceptionMessage(ex);
 		}
 	}
 

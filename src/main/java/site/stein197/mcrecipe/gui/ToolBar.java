@@ -1,9 +1,9 @@
-package site.stein197.mcrecipeeditor.gui;
+package site.stein197.mcrecipe.gui;
 
 import javax.swing.JToolBar;
 
 import net.miginfocom.swing.MigLayout;
-import site.stein197.mcrecipeeditor.Application;
+import site.stein197.mcrecipe.Application;
 
 import java.awt.event.ActionEvent;
 

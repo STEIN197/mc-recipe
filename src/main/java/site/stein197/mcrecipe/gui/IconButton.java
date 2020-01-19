@@ -1,6 +1,6 @@
-package site.stein197.mcrecipeeditor.gui;
+package site.stein197.mcrecipe.gui;
 
-import site.stein197.mcrecipeeditor.FileManager;
+import site.stein197.mcrecipe.FileManager;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;

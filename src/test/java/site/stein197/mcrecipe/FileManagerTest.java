@@ -1,4 +1,4 @@
-package site.stein197.mcrecipeeditor;
+package site.stein197.mcrecipe;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;

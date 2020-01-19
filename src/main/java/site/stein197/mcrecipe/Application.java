@@ -1,8 +1,12 @@
-package site.stein197.mcrecipeeditor;
+package site.stein197.mcrecipe;
 
-import site.stein197.mcrecipeeditor.gui.ToolBar;
+import site.stein197.mcrecipe.gui.ToolBar;
+import site.stein197.mcrecipe.sql.Database;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.Statement;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -21,6 +25,8 @@ import java.awt.event.WindowEvent;
 import java.awt.Dimension;
 import java.awt.Point;
 
+// import org.sqlite.JDBC;
+
 public class Application {
 
 	public static final Application instance = new Application();
@@ -31,14 +37,21 @@ public class Application {
 	private ApplicationProperties properties;
 
 	public static void main(String... args) throws Exception {
-		
+		// System.out.println(new FileManager(FOLDER_PATH + "ff").loadFile().toString());
+		// Connection co = DriverManager.getConnection("jdbc:sqlite:users.db");
+		// var q = "create table if not exists user (name varchar(5), phone varchar (5))";
+		// Statement s = co.createStatement();
+		// s.executeUpdate(q);
+		// q = "insert into user (name, phone) values ('nm', 'ph')";
+		// s = co.createStatement();
+		// s.executeUpdate(q);
 	}
 
 	private Application() {
 		this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		var propertiesAreLoaded = this.loadProperties();
 		if (!propertiesAreLoaded)
-			this.showErrorMessage("Failed to load properties", new Exception());
+			this.showExceptionMessage("Failed to load properties", new Exception());
 		this.setupGUI();
 		this.setListeners();
 		this.frame.setVisible(true);
@@ -49,7 +62,7 @@ public class Application {
 	 * @param message Message to be shown to user.
 	 * @param ex Exception that led to error.
 	 */
-	public void showErrorMessage(String message, Exception ex) {
+	public void showExceptionMessage(String message, Exception ex) {
 		message = message == null ? "" : message;
 		var builder = new StringBuilder(message);
 		for (StackTraceElement e : ex.getStackTrace()) {
@@ -58,6 +71,10 @@ public class Application {
 				.append(e.toString());
 		}
 		JOptionPane.showMessageDialog(this.frame, builder.toString(), ex.getClass().getCanonicalName(), JOptionPane.ERROR_MESSAGE);
+	} // TODO System.exit();
+
+	public void showExceptionMessage(Exception ex) {
+		this.showExceptionMessage(ex.getMessage(), ex);
 	}
 
 	private void setListeners() {
@@ -131,7 +148,7 @@ public class Application {
 			this.properties = ApplicationProperties.getInstance();
 			return true;
 		} catch (Exception ex) {
-			this.showErrorMessage(ex.getMessage(), ex);
+			this.showExceptionMessage(ex.getMessage(), ex);
 			return false;
 		}
 	}
@@ -152,7 +169,7 @@ public class Application {
 				try {
 					Application.this.properties.saveChanges();
 				} catch (IOException ex) {
-					Application.this.showErrorMessage(ex.getMessage(), ex);
+					Application.this.showExceptionMessage(ex.getMessage(), ex);
 				}
 			}
 		});

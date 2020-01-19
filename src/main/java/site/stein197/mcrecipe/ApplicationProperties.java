@@ -1,4 +1,4 @@
-package site.stein197.mcrecipeeditor;
+package site.stein197.mcrecipe;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -76,3 +76,4 @@ public class ApplicationProperties {
 	}
 }
 // TODO What if file has illegal format
+// TODO Remove it. Replace with sqlite

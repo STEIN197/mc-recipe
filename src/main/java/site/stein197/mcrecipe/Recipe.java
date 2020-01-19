@@ -1,4 +1,4 @@
-package site.stein197.mcrecipeeditor;
+package site.stein197.mcrecipe;
 
 public class Recipe {
 	private Item[][] recipe;

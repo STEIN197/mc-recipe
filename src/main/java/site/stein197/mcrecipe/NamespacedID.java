@@ -1,4 +1,4 @@
-package site.stein197.mcrecipeeditor;
+package site.stein197.mcrecipe;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -20,13 +20,13 @@ public class NamespacedID {
 			var fManager = new FileManager(NS_PATH);
 			file = fManager.loadFile();
 		} catch (Exception ex) {
-			Application.instance.showErrorMessage(ex.getMessage(), ex);
+			Application.instance.showExceptionMessage(ex);
 		}
 		if (file != null)
 			try {
 				readFromFile();
 			} catch (IOException ex) {
-				Application.instance.showErrorMessage(ex.getMessage(), ex);
+				Application.instance.showExceptionMessage(ex);
 			}
 	}
 
