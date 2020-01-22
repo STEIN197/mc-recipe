@@ -49,7 +49,7 @@ public class ToolBar extends JToolBar {
 	 * @param e
 	 */
 	private void addItem(ActionEvent e) {
-		new ItemDialog(Application.instance.frame, true).setVisible(true);
+		new ItemDialog(Application.getInstance().frame, true).setVisible(true);
 	}
 
 	private void addRecipe(ActionEvent e) {} // TODO

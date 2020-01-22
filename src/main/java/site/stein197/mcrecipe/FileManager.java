@@ -20,11 +20,16 @@ public class FileManager {
 		try {
 			CURRENT_DIRECTORY = new File(url.toURI()).getParentFile();
 		} catch (URISyntaxException ex) {
-			Application.instance.showExceptionMessage(ex);
+			Application.getInstance().showExceptionMessage(ex);
 		}
 	}
 
-	public FileManager(String path) throws IllegalArgumentException, URISyntaxException {
+	/**
+	 * 
+	 * @param path Path relative to current jar directory. Like assets/image.png.
+	 * @throws IllegalArgumentException
+	 */
+	public FileManager(String path) throws IllegalArgumentException {
 		if (path == null || path.length() == 0)
 			throw new IllegalArgumentException("Empty path string");
 		this.path = path;
@@ -38,13 +43,17 @@ public class FileManager {
 	 * @throws SecurityException
 	 */
 	public File loadFile() throws IOException, SecurityException {
-		if (!this.file.exists()) {
+		if (!this.fileExists()) {
 			this.createFile();
 		}
 		return this.file;
 	}
 
-	private void createFile() throws IOException, SecurityException {
+	public boolean fileExists() {
+		return this.file.exists();
+	}
+
+	public boolean createFile() throws IOException, SecurityException {
 		boolean created = false;
 		try {
 			created = this.file.createNewFile();
@@ -61,6 +70,12 @@ public class FileManager {
 			}
 		}
 		this.file.createNewFile();
+		return created;
+	}
+
+	@Override
+	public String toString() {
+		return this.file.toString();
 	}
 
 	public static URL getResource(String path) throws NullPointerException {

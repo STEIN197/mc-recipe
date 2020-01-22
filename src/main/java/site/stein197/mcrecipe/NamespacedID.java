@@ -20,13 +20,13 @@ public class NamespacedID {
 			var fManager = new FileManager(NS_PATH);
 			file = fManager.loadFile();
 		} catch (Exception ex) {
-			Application.instance.showExceptionMessage(ex);
+			Application.getInstance().showExceptionMessage(ex);
 		}
 		if (file != null)
 			try {
 				readFromFile();
 			} catch (IOException ex) {
-				Application.instance.showExceptionMessage(ex);
+				Application.getInstance().showExceptionMessage(ex);
 			}
 	}
 

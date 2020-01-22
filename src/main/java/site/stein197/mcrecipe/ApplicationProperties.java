@@ -7,24 +7,18 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.LinkedList;
+
+import site.stein197.mcrecipe.sql.Database;
 
 public class ApplicationProperties {
 
-	private static final String PROPERTIES_PATH = Application.FOLDER_PATH + "properties.conf";
-	private static ApplicationProperties instance;
-	private HashMap<String, String> properties;
-	private File file;
+	private HashMap<String, String> properties = new HashMap<>();
 
-	private ApplicationProperties() throws IllegalArgumentException, URISyntaxException, IOException {
-		this.load();
+	public ApplicationProperties() throws SQLException {
 		this.read();
-	}
-
-	public static ApplicationProperties getInstance() throws IllegalArgumentException, URISyntaxException, IOException {
-		if (instance == null)
-			instance = new ApplicationProperties();
-		return instance;
 	}
 
 	public String getValue(String key) {
@@ -37,43 +31,23 @@ public class ApplicationProperties {
 		return old;
 	}
 
-	public void saveChanges() throws IOException {
-		var builder = new StringBuilder();
+	public void saveChanges() throws SQLException {
+		Database db = Application.getInstance().getDB();
+		db.query("DELETE FROM Property");
 		for (var e : this.properties.entrySet()) {
-			builder
-				.append(e.getKey())
-				.append("=")
-				.append(e.getValue())
-				.append("\n");
+			db.query("INSERT INTO Property (name, value) VALUES ('" + e.getKey() + "', '" + e.getValue() + "')");
 		}
-		var writer = new BufferedWriter(new FileWriter(this.file, false));
-		writer.write(builder.toString());
-		writer.close();
-	}
 
-	private void load() throws IllegalArgumentException, URISyntaxException, IOException {
-		var manager = new FileManager(PROPERTIES_PATH);
-		this.file = manager.loadFile();
 	}
 
 	/**
-	 * Reads file into {@link #properties}.
+	 * Reads data from database into {@link #properties}
 	 */
-	private void read() throws IOException {
-		var reader = new BufferedReader(new FileReader(this.file));
-		String line = null;
-		this.properties = new HashMap<>();
-		do {
-			line = reader.readLine();
-			if (line == null)
-				break;
-			String[] parts = line.split("=");
-			if (parts.length < 2)
-				continue;
-			this.properties.put(parts[0], parts[1]);
-		} while (line != null);
-		reader.close();
+	private void read() throws SQLException {
+		Database db = Application.getInstance().getDB();
+		LinkedList<HashMap<String, String>> data = db.getResults("SELECT * FROM Property");
+		for (HashMap<String, String> row : data)
+			this.properties.put(row.get("name"), row.get("value"));
 	}
 }
-// TODO What if file has illegal format
 // TODO Remove it. Replace with sqlite

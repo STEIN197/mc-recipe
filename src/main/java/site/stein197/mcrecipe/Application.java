@@ -6,6 +6,7 @@ import site.stein197.mcrecipe.sql.Database;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.sql.Statement;
 
 import javax.swing.ImageIcon;
@@ -29,27 +30,39 @@ import java.awt.Point;
 
 public class Application {
 
-	public static final Application instance = new Application();
 	public static final String TITLE = "Minecraft Recipe Editor";
 	public static final String FOLDER_PATH = "./mcrecipe/";
 
+	private static Application instance;
+
 	public final JFrame frame = new JFrame(TITLE);
 	private ApplicationProperties properties;
+	private Database db;
 
 	public static void main(String... args) throws Exception {
-		Database.getInstance();
+		instance = new Application();
+		instance.setupDatabaseConnection();
+		instance.loadProperties();
+		instance.setupGUI();
+		instance.setListeners();
+		instance.frame.setVisible(true);
 	}
 
 	private Application() {
 		this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		this.loadProperties();
-		this.setupGUI();
-		this.setListeners();
-		this.frame.setVisible(true);
+	}
+
+	public static Application getInstance() {
+		return instance == null ? instance = new Application() : instance;
+	}
+
+	public Database getDB() {
+		return this.db;
 	}
 
 	/**
 	 * Tells user about happened exceptions.
+	 * Exits the app.
 	 * @param message Message to be shown to user.
 	 * @param ex Exception that led to error.
 	 */
@@ -63,6 +76,7 @@ public class Application {
 				.append(e.toString());
 		}
 		JOptionPane.showMessageDialog(this.frame, builder.toString(), ex.getClass().getCanonicalName(), JOptionPane.ERROR_MESSAGE);
+		System.out.println(ex);
 		System.exit(1);
 	}
 
@@ -110,6 +124,15 @@ public class Application {
 		this.frame.setSize(size);
 	}
 
+	private void setupDatabaseConnection() {
+		this.db = new Database();
+		try {
+			db.connect();
+		} catch (Exception ex) {
+			this.showExceptionMessage("Failed to connect to database", ex);
+		}
+	}
+
 	private void setupSplitPane() {
 		var splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		splitPane.setDividerLocation(0.5);
@@ -131,16 +154,11 @@ public class Application {
 		splitPane.setLeftComponent(scrollPane);
 	}
 
-	/**
-	 * Loads configuration file.
-	 * @param path Relative path to file.
-	 * @return {@code true} if configuration was successfully loaded.
-	 */
 	private void loadProperties() {
 		try {
-			this.properties = ApplicationProperties.getInstance();
-		} catch (Exception ex) {
-			this.showExceptionMessage(ex.getMessage(), ex);
+			this.properties = new ApplicationProperties();
+		} catch (SQLException ex) {
+			this.showExceptionMessage("Failed to load application properties", ex);
 		}
 	}
 
@@ -159,8 +177,8 @@ public class Application {
 				properties.setValue("fullscreen", Boolean.toString(frame.getExtendedState() == JFrame.MAXIMIZED_BOTH));
 				try {
 					Application.this.properties.saveChanges();
-				} catch (IOException ex) {
-					Application.this.showExceptionMessage(ex);
+				} catch (SQLException ex) {
+					Application.this.showExceptionMessage(ex.getMessage(), ex);
 				}
 			}
 		});

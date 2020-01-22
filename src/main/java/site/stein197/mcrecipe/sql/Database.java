@@ -8,9 +8,12 @@ import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.SQLTimeoutException;
 import java.sql.Statement;
-import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
 
 import site.stein197.mcrecipe.Application;
 import site.stein197.mcrecipe.FileManager;
@@ -19,43 +22,59 @@ public class Database {
 
 	private static final String DB_PATH = Application.FOLDER_PATH + "application.db";
 	private static final String SETUP_PATH = "/setup.sql";
-	private static Database instance;
 	private Connection connection;
+	private boolean connected = false;
 
-	private Database() {
-		try {
-			boolean exists = this.exists();
-			String absPath = new FileManager(DB_PATH).loadFile().toString();
-			this.connection = DriverManager.getConnection("jdbc:sqlite:" + absPath);
-			if (!exists)
-				this.setupSchema();
-		} catch (Exception ex) {
-			Application.instance.showExceptionMessage(ex);
+	public void connect() throws IOException, SQLException {
+		if (this.connected)
+			return;
+		var fManager = new FileManager(DB_PATH);
+		this.connection = DriverManager.getConnection("jdbc:sqlite:" + fManager.toString());
+		if (!fManager.fileExists()) {
+			fManager.createFile();
+			this.setupSchema();
 		}
+		this.connected = true;
 	}
 
-	public static Database getInstance() {
-		return instance == null ? instance = new Database() : instance;
-	}
-
-	public ResultSet query(String query) throws SQLException {
+	public void query(String query) throws SQLException, SQLTimeoutException {
 		Statement s = this.connection.createStatement();
-		return s.executeQuery(query);
+		s.executeUpdate(query);
 	}
 
-	private boolean exists() {
-		return new File(FileManager.CURRENT_DIRECTORY, DB_PATH).exists();
+	public LinkedList<HashMap<String, String>> getResults(String query) throws SQLException {
+		Statement stmt = this.connection.createStatement();
+		ResultSet rs = stmt.executeQuery(query);
+		ResultSetMetaData meta = rs.getMetaData();
+		int columnsCount = meta.getColumnCount();
+		var list = new LinkedList<HashMap<String, String>>();
+		while (rs.next()) {
+			var row = new HashMap<String, String>();
+			for (int i = 1; i <= columnsCount; i++)
+				row.put(meta.getColumnLabel(i), rs.getString(i));
+			list.add(row);
+		}
+		rs.close();
+		stmt.close();
+		return list;
 	}
 
-	private void setupSchema() throws IOException, SQLException, URISyntaxException {
+	private void setupSchema() throws IOException {
 		URL url = FileManager.getResource(SETUP_PATH);
-		var inputStream = new FileInputStream(new File(url.toURI()));
-		byte[] data = inputStream.readAllBytes();
-		var builder = new StringBuilder();
-		for (byte b : data)
-			builder.append((char) b);
-		this.query(Arrays.toString(data));
-		// System.out.println(builder.toString());
-		inputStream.close();
+		try {
+			var inputStream = new FileInputStream(new File(url.toURI()));
+			byte[] data = inputStream.readAllBytes();
+			var builder = new StringBuilder();
+			for (byte b : data)
+				builder.append((char) b);
+			this.query(builder.toString());
+			inputStream.close();
+		} catch (URISyntaxException ex) {
+			Application.getInstance().showExceptionMessage("Failed to open file input stream", ex);
+		} catch (SQLTimeoutException ex) {
+			Application.getInstance().showExceptionMessage("DB timeout exceeded", ex);
+		} catch (SQLException ex) {
+			Application.getInstance().showExceptionMessage(ex);
+		}
 	}
 }
