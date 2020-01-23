@@ -6,49 +6,67 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.regex.Pattern;
+
+import site.stein197.mcrecipe.sql.Database;
 
 public class NamespacedID {
 
-	private static final String NS_PATH = Application.FOLDER_PATH + "ns.conf";
-	
-	private static File file;
-	private static LinkedList<String> namespaces;
+	private static LinkedList<NamespacedID> namespaces;
+	private static Pattern nameRegex = Pattern.compile("^[a-z0-9\\-_]+$");
 
-	static {
+	private String name;
+
+	public NamespacedID(String ns) {
+		this.name = ns.toLowerCase();
+	}
+
+	public void create() {
+
+	}
+
+	private boolean exists() {
+		Database db = Application.getInstance().getDB();
+		boolean exists = true;
 		try {
-			var fManager = new FileManager(NS_PATH);
-			file = fManager.loadFile();
-		} catch (Exception ex) {
+			exists = db.getResults("SELECT * FROM Namespace WHERE name = '" + this.name + "'").size() > 0;
+		} catch (SQLException ex) {
 			Application.getInstance().showExceptionMessage(ex);
 		}
-		if (file != null)
+		return exists;
+	}
+
+	private boolean nameIsValid() {
+		var matcher = nameRegex.matcher(this.name);
+		return matcher.matches();
+	}
+
+	private boolean nameIsEmpty() {
+		return this.name.isEmpty();
+	}
+
+	public static List<NamespacedID> getList() { // Try to return interface instead of class
+		if (namespaces == null) {
+			namespaces = new LinkedList<>();
+			Database db = Application.getInstance().getDB();
 			try {
-				readFromFile();
-			} catch (IOException ex) {
+				LinkedList<HashMap<String, String>> data = db.getResults("SELECT * FROM Namespace");
+				for (var e : data)
+					namespaces.add(new NamespacedID(e.get("name")));
+			} catch (Exception ex) {
 				Application.getInstance().showExceptionMessage(ex);
 			}
-	}
-
-	public static void saveChanges() throws IOException {
-		var builder = new StringBuilder();
-		for (var ns : namespaces) {
-			builder
-				.append(ns)
-				.append("\n");
 		}
-		var writer = new BufferedWriter(new FileWriter(file, false));
-		writer.write(builder.toString());
-		writer.close();
+		return namespaces;
 	}
 
-	private static void readFromFile() throws IOException {
-		var reader = new BufferedReader(new FileReader(file));
-		String line = null;
-		namespaces = new LinkedList<>();
-		while ((line = reader.readLine()) != null)
-			namespaces.add(line);
-		reader.close();
+	@Override
+	public String toString() {
+		return this.name;
 	}
 }
 // TODO Add validator or JFomattedTextField instead

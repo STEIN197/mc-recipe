@@ -54,5 +54,7 @@ public class ToolBar extends JToolBar {
 
 	private void addRecipe(ActionEvent e) {} // TODO
 
-	private void addNamespace(ActionEvent e) {} // TODO
+	private void addNamespace(ActionEvent e) {
+		new NamespaceDialog(Application.getInstance().frame, true).setVisible(true);
+	}
 }

@@ -39,7 +39,7 @@ public class Application {
 	private ApplicationProperties properties;
 	private Database db;
 
-	public static void main(String... args) throws Exception {
+	public static void main(String... args) {
 		instance = new Application();
 		instance.setupDatabaseConnection();
 		instance.loadProperties();
