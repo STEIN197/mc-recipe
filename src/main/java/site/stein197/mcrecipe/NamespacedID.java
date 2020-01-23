@@ -25,8 +25,16 @@ public class NamespacedID {
 		this.name = ns.toLowerCase();
 	}
 
-	public void create() {
-
+	public void create() throws Exception, SQLException {
+		if (this.nameIsEmpty())
+			throw new Exception("Namespace name is empty");
+		if (!this.nameIsValid())
+			throw new Exception("Name contains invalid characters. Allowable are 0-9, a-z, - and _");
+		// if (this.exists())
+		// 	throw new Exception("Namespace with given name alredy exists");
+		Database db = Application.getInstance().getDB();
+		db.query("INSERT INTO Namespace (name) VALUES ('" + this.name + "')"); // Maybe in case of unique column exception will thrown
+		updateList();
 	}
 
 	private boolean exists() {
@@ -51,17 +59,21 @@ public class NamespacedID {
 
 	public static List<NamespacedID> getList() { // Try to return interface instead of class
 		if (namespaces == null) {
-			namespaces = new LinkedList<>();
-			Database db = Application.getInstance().getDB();
-			try {
-				LinkedList<HashMap<String, String>> data = db.getResults("SELECT * FROM Namespace");
-				for (var e : data)
-					namespaces.add(new NamespacedID(e.get("name")));
-			} catch (Exception ex) {
-				Application.getInstance().showExceptionMessage(ex);
-			}
+			updateList();
 		}
 		return namespaces;
+	}
+
+	private static void updateList() {
+		namespaces = new LinkedList<>();
+		Database db = Application.getInstance().getDB();
+		try {
+			LinkedList<HashMap<String, String>> data = db.getResults("SELECT * FROM Namespace");
+			for (var e : data)
+				namespaces.add(new NamespacedID(e.get("name")));
+		} catch (Exception ex) {
+			Application.getInstance().showExceptionMessage(ex);
+		}
 	}
 
 	@Override
