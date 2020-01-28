@@ -13,6 +13,8 @@ public class ToolBar extends JToolBar {
 
 	/** Saves all changes to files */
 	private final IconButton btnSaveChanges = new IconButton("/images/music_disc_wait.png", "Save changes");
+	private final IconButton btnUndo = new IconButton("/images/undo.png", "Undo");
+	private final IconButton btnRedo = new IconButton("/images/redo.png", "Redo");
 	private final IconButton btnNewItem = new IconButton("/images/item_grass.png", "Add a new item");
 	private final IconButton btnNewRecipe = new IconButton("/images/crafting_table_front_plus.png", "Add a recipe");
 	private final IconButton btnNewMachine = new IconButton("/images/anvil_base_plus.png", "Add a machine");
@@ -36,6 +38,8 @@ public class ToolBar extends JToolBar {
 
 	private void addControls() {
 		this.add(this.btnSaveChanges);
+		this.add(this.btnUndo);
+		this.add(this.btnRedo);
 		this.add(this.btnNewItem);
 		this.add(this.btnNewRecipe);
 		this.add(this.btnNewMachine);

@@ -5,16 +5,19 @@ CREATE TABLE IF NOT EXISTS Property (
 
 CREATE TABLE IF NOT EXISTS Namespace (
 	ID INTEGER PRIMARY KEY AUTOINCREMENT,
-	name TEXT NOT NULL
+	name TEXT UNIQUE NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS Item (
 	ID INTEGER UNIQUE NOT NULL, -- Numeric ID of item
-	namespace ID NOT NULL, -- String ID of item. Used in conjuction with namespace prefix
-	nsID INTEGER NOT NULL DEFAULT 0, -- Namespace. By default should be 'minecraft'
+	ns INTEGER NOT NULL DEFAULT 0, -- Namespace. By default should be 'minecraft'
+	nsID TEXT NOT NULL,
 	name TEXT NOT NULL, -- Name/title of item
 	icon TEXT NOT NULL, -- Name of icon associated with item
-	FOREIGN KEY (namespace) REFERENCES Namespace (ID)
+	FOREIGN KEY (ns) REFERENCES Namespace (ID)
 );
 
-INSERT INTO Namespace VALUES (0, 'minecraft');
+INSERT INTO Namespace
+	VALUES (0, 'minecraft');
+INSERT INTO Item VALUES
+	(2, 0, 'grass_block', 'Grass Block', 'grass_block.png');

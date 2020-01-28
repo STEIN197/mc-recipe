@@ -29,9 +29,12 @@ public class Database {
 		if (this.connected)
 			return;
 		var fManager = new FileManager(DB_PATH);
-		this.connection = DriverManager.getConnection("jdbc:sqlite:" + fManager.toString());
-		if (!fManager.fileExists()) {
+		boolean dbExists = fManager.fileExists();
+		if (!dbExists) {
 			fManager.createFile();
+		}
+		this.connection = DriverManager.getConnection("jdbc:sqlite:" + fManager.toString());
+		if (!dbExists) {
 			this.setupSchema();
 		}
 		this.connected = true;

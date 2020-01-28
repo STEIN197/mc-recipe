@@ -3,11 +3,7 @@ package site.stein197.mcrecipe;
 import site.stein197.mcrecipe.gui.ToolBar;
 import site.stein197.mcrecipe.sql.Database;
 
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -142,16 +138,16 @@ public class Application {
 	}
 
 	private void setupLeftSide(JSplitPane splitPane) {
-		var pane = new JPanel(new MigLayout("wrap 1", "[grow, fill]"));
-		var scrollPane = new JScrollPane(pane);
-		// scrollPane.setLayout(new MigLayout("flowy"));
+		var rootPane = new JPanel(new MigLayout("flowy", "[grow, fill]"));
+		var scrollPane = new JScrollPane(new JPanel());
 		var label = new JLabel("Search items");
 		var searchField = new JTextField();
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		pane.add(label);
-		pane.add(searchField, "growx 100");
-		splitPane.setLeftComponent(scrollPane);
+		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		rootPane.add(label);
+		rootPane.add(searchField, "growx 100");
+		rootPane.add(scrollPane, "pushy, growy 100");
+		splitPane.setLeftComponent(rootPane);
 	}
 
 	private void loadProperties() {

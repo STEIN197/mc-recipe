@@ -40,6 +40,7 @@ public class ItemDialog extends JDialog {
 		var root = new JPanel(new MigLayout("wrap 2", "[][fill]"));
 		this.setContentPane(root);
 		root.add(new JLabel("Numeric ID*: "));
+		this.numIDField.setValue(new Integer(0));
 		root.add(this.numIDField, "pushx");
 		root.add(new JLabel("Namespace *: "));
 		root.add(this.namespaces);
